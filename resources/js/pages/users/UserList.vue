@@ -1,5 +1,24 @@
-<template>
+<script setup>
+import axios from "axios";
+import { ref, onMounted } from 'vue';
 
+const users =ref([]); 
+
+const getUsers = () => {
+    axios.get('/api/users')
+        .then((response) => {
+            users.value = response.data;
+        });
+};
+onMounted(() => {
+    getUsers();
+});
+</script>
+
+
+
+
+<template>
     <div class="content-header">
         <div class="container-fluid">
             <div class="row mb-2">
@@ -55,11 +74,22 @@
                                 <th>Options</th>
                             </tr>
                         </thead>
-                        <tbody></tbody>
+                        <tbody>
+                            <tr v-for="(user, index) in users" :key="user.id">
+                                <td>
+                                    <input type="checkbox" />
+                                </td>
+                                <td>{{ index + 1 }}</td>
+                                <td>{{ user.name }}</td>
+                                <td>{{ user.email }}</td>
+                                <td>2021-09-09</td>
+                                <td>Admin</td>
+                                <td></td>
+                            </tr>
+                        </tbody>
                     </table>
                 </div>
             </div>
         </div>
     </div>
-
 </template>
