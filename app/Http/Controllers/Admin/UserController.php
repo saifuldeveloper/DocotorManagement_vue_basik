@@ -15,14 +15,14 @@ class UserController extends Controller
     }
     public function store()
     {
-         
 
-       request()->validate([
+
+        request()->validate([
+            'name' => 'required',
             'email' => 'required|email|unique:users,email',
+            'password' => 'required|min:8',
+
         ]);
-
-
-
         return User::create([
             'name' => request('name'),
             'email' => request('email'),
@@ -31,6 +31,11 @@ class UserController extends Controller
     }
     public function update(User $user)
     {
+        request()->validate([
+            'name' => 'required',
+            'email' => 'required|unique:users,email,' . $user->id,
+            'password' => 'required|min:8',
+        ]);
         $user->update([
             'name' => request('name'),
             'email' => request('email'),
@@ -38,4 +43,15 @@ class UserController extends Controller
         ]);
         return $user;
     }
+
+    public function destroy(User $user){
+
+     
+        $user->delete();
+        return response()->noContent();
+    }
+
+
+
+
 }
