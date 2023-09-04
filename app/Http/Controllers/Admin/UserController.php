@@ -44,12 +44,27 @@ class UserController extends Controller
         return $user;
     }
 
+
+
+
+
+    public function changeRole(User $user)
+    {
+        $user->update([
+            'role' => request('role'),
+        ]);
+
+        return response()->json(['success' => true]);
+    }
+
     public function destroy(User $user){
 
      
         $user->delete();
         return response()->noContent();
     }
+
+
 
 
 
