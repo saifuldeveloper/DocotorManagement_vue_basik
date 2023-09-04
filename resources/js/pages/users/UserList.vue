@@ -1,10 +1,13 @@
 <script setup>
 import axios from "axios";
-import { ref, onMounted, reactive } from "vue";
+import { ref, onMounted, watch} from "vue";
 import { Form, Field } from "vee-validate";
 import * as yup from "yup";
 import { UseToastr } from "../../toastr.js";
 import UserListItem from './UserListItem.vue';
+import { debounce } from "lodash";
+
+
 
 const toastr = UseToastr();
 const users = ref([]);
@@ -90,12 +93,36 @@ const handleSubmit = (values, actions) => {
     }
 };
 
-
-
 const userDeleted=(userId)=>{
     users.value = users.value.filter((user => user.id !== userId));
     
 }
+
+
+const searchQuery = ref("");
+
+const search = () => {
+    axios.get('/api/users/search',{
+        params:{
+            query:searchQuery.value
+        }
+    })
+    .then((response) => {
+        users.value = response.data;
+    })
+    .catch((error) => {
+        console.log(error);
+    });
+};
+
+
+
+watch(searchQuery,debounce(()=>{
+    search();
+},300));
+ 
+
+
 
 
 
@@ -145,6 +172,7 @@ onMounted(() => {
                 </div>
                 <div>
                     <input
+                         v-model="searchQuery"
                         type="text"
                         class="form-control"
                         placeholder="Search..."
@@ -167,7 +195,7 @@ onMounted(() => {
                                 <th>Options</th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody  v-if="users.length > 0">
                            <UserListItem  v-for="(user, index) in users" 
                                :key="user.id"
                                  :user="user"
@@ -176,6 +204,11 @@ onMounted(() => {
                                     @user-deleted="userDeleted"
 
                            />
+                        </tbody>
+                        <tbody v-else>
+                            <tr>
+                                <td colspan="6" class="text-center">No results found...</td>
+                            </tr>
                         </tbody>
                     </table>
                 </div>

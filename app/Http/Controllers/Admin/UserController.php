@@ -15,8 +15,6 @@ class UserController extends Controller
     }
     public function store()
     {
-
-
         request()->validate([
             'name' => 'required',
             'email' => 'required|email|unique:users,email',
@@ -44,7 +42,14 @@ class UserController extends Controller
         return $user;
     }
 
+    public function search()
+    {
+        $search = request('query');
+        $users = User::where('name', 'like', "%$search%")
+            ->get();
+        return response()->json($users);
 
+    }
 
 
 
@@ -57,16 +62,10 @@ class UserController extends Controller
         return response()->json(['success' => true]);
     }
 
-    public function destroy(User $user){
+    public function destroy(User $user)
+    {
 
-     
         $user->delete();
         return response()->noContent();
     }
-
-
-
-
-
-
 }
